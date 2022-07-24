@@ -13,10 +13,10 @@ func Set(processName string) {
 
 // 処理開始ログ
 func Start() {
-	log.Printf("[START]: %s\n", *process)
+	log.Printf("[%s]: START\n", *process)
 }
 
 // 処理終了ログ
 func End() {
-	log.Printf("[END]: %s\n", *process)
+	log.Printf("[%s]: END\n", *process)
 }
