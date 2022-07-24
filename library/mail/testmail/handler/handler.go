@@ -21,12 +21,14 @@ func Exec() error {
 	// batchIDの有効チェック
 	res, err := sg.ValicateBatchID(batchID)
 	if err != nil {
+		err = fmt.Errorf("err: %w", err)
 		return err
 	}
 
 	// ステータスコードが200以外の場合、エラーにして返却
 	if res.StatusCode != 200 {
 		err = fmt.Errorf("batchIDが無効です/batchID: %s", batchID)
+		return err
 	}
 
 	return nil
