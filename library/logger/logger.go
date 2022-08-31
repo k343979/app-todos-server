@@ -1,22 +1,37 @@
 package logger
 
 import (
-	"log"
+	"io/ioutil"
+	"strings"
+
+	log "github.com/cihub/seelog"
 )
 
-var process *string
+// Logger
+var Log log.LoggerInterface
 
-// 初期設定
+// Set
+// ログの初期設定
+// param processName : 処理の種別
 func Set(processName string) {
-	process = &processName
-}
+	// 処理種別が空の場合、panic
+	if processName == "" {
+		panic("kind of process is unclear")
+	}
 
-// 処理開始ログ
-func Start() {
-	log.Printf("[%s]: START\n", *process)
-}
+	// log.xmlファイルの読み取り
+	buf, err := ioutil.ReadFile("../log.xml")
+	if err != nil {
+		panic(err)
+	}
 
-// 処理終了ログ
-func End() {
-	log.Printf("[%s]: END\n", *process)
+	// $PROCESS$を処理種別に書き換え
+	xmldoc := strings.Replace(string(buf), "$PROCESS$", processName, 1)
+	// log.xmlの設定をもとにloggerを作成
+	logger, err := log.LoggerFromConfigAsBytes([]byte(xmldoc))
+	if err != nil {
+		panic(err)
+	}
+
+	Log = logger
 }
