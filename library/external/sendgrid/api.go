@@ -14,31 +14,40 @@ type Client struct {
 	ApiKei string // APIキー
 }
 
-// SendGridインターフェース
-type SendGrid interface {
-	ExecApi(uri, method string) (*rest.Response, error)
-}
-
-// API通信用クライアント構造体をSendGridインターフェースとして返却
-// return : *Client SendGridインターフェース
-func New() SendGrid {
+// API通信用クライアント構造体を返却
+// return : *Client
+func New() *Client {
 	return &Client{
 		Host:   os.Getenv("SENDGRID_API_URL"),
 		ApiKei: os.Getenv("SENDGRID_API_KEY"),
 	}
 }
 
-// ExecApi
-// API実行メソッド
+// Get
+// API実行メソッド(GET)
 // param uri : APIエンドポイント
-// param method : API通信種別
 // return res : レスポンス結果
 // return err : エラー情報
-func (c *Client) ExecApi(uri, method string) (res *rest.Response, err error) {
+func (c *Client) Get(uri string) (*rest.Response, error) {
 	// リクエスト情報のセット
 	req := sendgrid.GetRequest(c.ApiKei, uri, c.Host)
-	req.Method = rest.Method(method)
+	req.Method = rest.Method("GET")
 	// APIの実行
-	res, err = sendgrid.API(req)
-	return
+	return sendgrid.API(req)
+}
+
+// Post
+// API実行メソッド(POST)
+// param uri : APIエンドポイント
+// return res : レスポンス結果
+// return err : エラー情報
+func (c *Client) Post(uri string, reqBody []byte) (*rest.Response, error) {
+	// リクエスト情報のセット
+	req := sendgrid.GetRequest(c.ApiKei, uri, c.Host)
+	req.Method = rest.Method("POST")
+	if reqBody != nil {
+		req.Body = reqBody
+	}
+	// APIの実行
+	return sendgrid.API(req)
 }

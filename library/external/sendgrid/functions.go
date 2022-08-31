@@ -16,5 +16,5 @@ func ValicateBatchID(batchID string) (*rest.Response, error) {
 	sgClient := New()
 	uri := fmt.Sprintf("/mail/batch/%s", batchID)
 	// API実行
-	return sgClient.ExecApi(uri, "GET")
+	return sgClient.Get(uri)
 }
