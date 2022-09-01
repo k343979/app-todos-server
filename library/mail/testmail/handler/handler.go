@@ -1,30 +1,50 @@
+// テスト配信
+// 全体を制御するパッケージ
 package handler
 
 import (
+	"context"
+
 	"github.com/app-todos/library/logger"
 	sg "github.com/app-todos/library/external/sendgrid"
 )
 
+const (
+	to string = "yusuke040989@gmail.com" // 送信先メールアドレス
+)
+
 // Exec
+// テスト配信処理の実行
+// param ctx : コンテキスト
 // return err : エラー情報
-func Exec() error {
+func Exec(ctx context.Context) error {
 	logger.Log.Info("START")
 	defer logger.Log.Info("END")
 
-	// (仮) batchID
-	batchID := "test"
+	// キャンセル処理の設定
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
-	// batchIDの有効チェック
-	res, err := sg.ValicateBatchID(batchID)
-	if err != nil {
-		err = logger.Log.Errorf("err: %w", err)
+	// テスト配信用構造体を設定
+	t := sg.NewTest(to)
+	if err := t.Send(ctx); err != nil {
+		logger.Log.Error(err)
 		return err
 	}
 
-	// ステータスコードが200以外の場合、エラーにして返却
-	if res.StatusCode != 200 {
-		logger.Log.Debugf("batchIDが無効です/batchID: %s", batchID)
-	}
-
 	return nil
+}
+
+// checkCancel
+// キャンセルチェック
+// param ctx : コンテキスト
+// return エラー情報
+func CheckCancel(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		_ = logger.Log.Error("canceled ctx")
+		return ctx.Err()
+	default:
+		return nil
+	}
 }
