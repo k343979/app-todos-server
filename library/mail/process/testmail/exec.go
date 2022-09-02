@@ -1,6 +1,6 @@
 // テスト配信
 // 全体を制御するパッケージ
-package handler
+package testmail
 
 import (
 	"context"
@@ -10,7 +10,13 @@ import (
 )
 
 const (
-	to string = "yusuke040989@gmail.com" // 送信先メールアドレス
+	name  string = "水口佑介"
+	email string = "yusuke040989@gmail.com" // 送信先メールアドレス
+)
+
+const (
+	html string  = "/go/src/github.com/app-todos/library/mail/template/testmail/html/text.html"
+	plain string = "/go/src/github.com/app-todos/library/mail/template/testmail/plain/text.html"
 )
 
 // Exec
@@ -25,8 +31,11 @@ func Exec(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	// 送信対象を設定
+	target := sg.NewTarget(name, email)
 	// テスト配信用構造体を設定
-	t := sg.NewTest(to)
+	t := target.NewTest(html, plain)
+	// メールを送信
 	if err := t.Send(ctx); err != nil {
 		logger.Log.Error(err)
 		return err
