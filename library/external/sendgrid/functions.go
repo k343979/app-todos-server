@@ -47,7 +47,7 @@ func (c *Client) CreateBatchID(ctx context.Context) (string, error) {
 // param ctx : コンテキスト
 // param batchID : バッチID
 // return エラー情報
-func (c *Client) ValicateBatchID(ctx context.Context, batchID string) error {
+func (c *Client) ValidateBatchID(ctx context.Context, batchID string) error {
 	uri := fmt.Sprintf("/mail/batch/%s", batchID)
 	// API実行
 	res, err := c.Get(ctx, uri)

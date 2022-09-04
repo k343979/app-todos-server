@@ -5,7 +5,6 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/app-todos/library/logger"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -75,7 +74,7 @@ func (t *Test) Send(ctx context.Context) error {
 	}
 
 	// batchIDの有効チェック
-	if err := c.ValicateBatchID(ctx, batchID); err != nil {
+	if err := c.ValidateBatchID(ctx, batchID); err != nil {
 		err = logger.Log.Errorf("err: %w", err)
 		return err
 	}
@@ -100,15 +99,18 @@ func (info *Info) Build(batchID string) []byte {
 	// 送信対象をセット
 	p := mail.NewPersonalization()
 	p.AddTos(mail.NewEmail(info.Target.Name, info.Target.Email))
+	// 送信対象者用に置換文字列をセット
+	info.SetConv(p)
 	// 送信対象をメール情報にセット
 	m.AddPersonalizations(p)
 
-	// ファイルパスの設定(HTML形式を優先)
+	// Content-Typeの設定(HTML形式を優先)
+	contentType := "text/plain"
+	// ファイルパスの設定
 	fp := info.PathPlain
-	format := "text/plain"
 	if info.PathHtml != "" {
+		contentType = "text/html"
 		fp = info.PathHtml
-		format = "text/html"
 	}
 
 	// テンプレートファイルの読み込み
@@ -116,9 +118,9 @@ func (info *Info) Build(batchID string) []byte {
 	if err != nil {
 		_ = logger.Log.Errorf("テンプレートファイルの読み込みに失敗しました/%w", err)
 	}
-	// メール本文の{%name%}を送信対象に置換
-	text := strings.ReplaceAll(string(buf), "{%name%}", info.Target.Name)
-	content := mail.NewContent(format, text)
+
+	// メール内容のセット
+	content := mail.NewContent(contentType, string(buf))
 	m.AddContent(content)
 
 	// バッチIDをセット
