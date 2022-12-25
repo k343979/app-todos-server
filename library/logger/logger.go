@@ -20,7 +20,7 @@ func Set(processName string) {
 	}
 
 	// log.xmlファイルの読み取り
-	buf, err := ioutil.ReadFile("/go/src/github.com/app-todos/log.xml")
+	buf, err := ioutil.ReadFile("/go/src/github.com/app-todos-server/log.xml")
 	if err != nil {
 		panic(err)
 	}
