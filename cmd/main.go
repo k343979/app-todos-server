@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/app-todos/cmd/infrastructure/router"
+	_ "github.com/app-todos/config"
 	"github.com/app-todos/library/logger"
 )
 
