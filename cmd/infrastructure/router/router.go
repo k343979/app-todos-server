@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/app-todos/library/logger"
+	"github.com/app-todos/cmd/adapter/controller"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -15,9 +16,13 @@ const (
 )
 
 var (
-	Origin []string = []string{"http://localhost:8080"}            // ベースURL
-	Method []string = []string{"GET", "POST", "DELETE", "OPTIONS"} // HTTP通信メソッド
-	Header []string = []string{"*"}                                // ヘッダー
+	Origin []string = []string{"http://localhost:8080"}                   // ベースURL
+	Method []string = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"} // HTTP通信メソッド
+	Header []string = []string{"*"}                                       // ヘッダー
+)
+
+var (
+	userC controller.IUser
 )
 
 // ルーティング情報構造体
@@ -50,6 +55,24 @@ func (r *Route) SetRoute() {
 		AllowMethods: r.Method,
 		AllowHeaders: r.Header,
 	}))
+
+	// コントローラのセット
+	SetControllers()
+
+	v1 := r.Gin.Group("/v1")
+	{
+		user := v1.Group("/user")
+		{
+			user.GET("/:id", userC.ByID)
+			user.PUT("", userC.Update)
+		}
+	}
+}
+
+// SetControllers
+// コントローラのセット
+func SetControllers() {
+	userC = controller.NewUser()
 }
 
 // Run
