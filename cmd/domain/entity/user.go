@@ -8,6 +8,6 @@ type User struct {
 	LastName  string `json:"lastName"`
 	FirstName string `json:"firstName"`
 	Email     string `json:"email"`
-	Tel       string `json:"phoneNumber"`
+	Tel       string `json:"tel"`
 	JobTitle  string `json:"jobTitle"`
 }

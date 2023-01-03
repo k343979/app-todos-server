@@ -44,11 +44,12 @@ func (u *User) ByID(id int) (*entity.User, error) {
 
 func (u *User) Update(req map[string]any) (*entity.User, error) {
 	user := &entity.User{
-		LastName: req["lastName"].(string),
+		ID:        int(req["id"].(float64)),
+		LastName:  req["lastName"].(string),
 		FirstName: req["firstName"].(string),
-		Email: req["email"].(string),
-		Tel: req["phoneNumber"].(string),
-		JobTitle: req["jobTitle"].(string),
+		Email:     req["email"].(string),
+		Tel:       req["tel"].(string),
+		JobTitle:  req["jobTitle"].(string),
 	}
 	return u.Repo.Update(user)
 }

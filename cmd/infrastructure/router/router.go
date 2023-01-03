@@ -4,8 +4,8 @@ package router
 import (
 	"context"
 
-	"github.com/app-todos/library/logger"
 	"github.com/app-todos/cmd/adapter/controller"
+	"github.com/app-todos/library/logger"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -49,7 +49,8 @@ func NewRoute() *Route {
 
 // SetRoute
 // Route構造体をもとにルーティングを設定
-func (r *Route) SetRoute() {
+// param ctx : コンテキスト
+func (r *Route) SetRoute(ctx context.Context) {
 	r.Gin.Use(cors.New(cors.Config{
 		AllowOrigins: r.Origin,
 		AllowMethods: r.Method,
@@ -57,7 +58,7 @@ func (r *Route) SetRoute() {
 	}))
 
 	// コントローラのセット
-	SetControllers()
+	setControllers(ctx)
 
 	v1 := r.Gin.Group("/v1")
 	{
@@ -71,8 +72,9 @@ func (r *Route) SetRoute() {
 
 // SetControllers
 // コントローラのセット
-func SetControllers() {
-	userC = controller.NewUser()
+// param ctx : コンテキスト
+func setControllers(ctx context.Context) {
+	userC = controller.NewUser(ctx)
 }
 
 // Run
@@ -84,7 +86,7 @@ func Run(ctx context.Context) {
 
 	// ルーティング設定
 	r := NewRoute()
-	r.SetRoute()
+	r.SetRoute(ctx)
 	// ルーティング定義
 	r.Gin.Run(r.Port)
 }

@@ -2,12 +2,13 @@
 package controller
 
 import (
+	"context"
 	"strconv"
-	"database/sql"
 
-	"github.com/app-todos/library/logger"
-	"github.com/app-todos/cmd/usecase"
+	"github.com/app-todos/cmd/infrastructure/database"
 	"github.com/app-todos/cmd/infrastructure/database/mysql"
+	"github.com/app-todos/cmd/usecase"
+	"github.com/app-todos/library/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,17 +33,30 @@ type IUser interface {
 
 // NewUser
 // ユーザ用コントローラ構造体の生成
+// param ctx : コンテキスト
 // return ユーザ用コントローラインターフェース
-func NewUser() IUser {
-	IUserRepo := mysql.NewUser(&sql.DB{})
+func NewUser(ctx context.Context) IUser {
+	db, err := database.Connect()
+	if err != nil {
+		logger.Log.Error(err)
+	}
+	IUserRepo := mysql.NewUser(ctx, db)
 	return &User{
 		uc: usecase.NewUser(IUserRepo),
 	}
 }
 
 func (u *User) ByID(c *gin.Context) {
-	id, _ := strconv.Atoi(c.Param("id"))
-	user, _ := u.uc.ByID(id)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		logger.Log.Error(err)
+	}
+	// 取得処理の実行
+	user, err := u.uc.ByID(id)
+	if err != nil {
+		logger.Log.Error(err)
+	}
+	// レスポンス設定
 	c.JSON(200, gin.H{"user": user})
 }
 
@@ -52,6 +66,11 @@ func (u *User) Update(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logger.Log.Error(err)
 	}
-	user, _ := u.uc.Update(req)
+	// 更新処理の実行
+	user, err := u.uc.Update(req)
+	if err != nil {
+		logger.Log.Error(err)
+	}
+	// レスポンス設定
 	c.JSON(200, gin.H{"user": user})
 }
