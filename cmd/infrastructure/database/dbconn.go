@@ -28,7 +28,7 @@ func Connect() (*bun.DB, error) {
 		DBName:    config.DB.Name,
 		User:      config.DB.User,
 		Passwd:    config.DB.Password,
-		Addr:      fmt.Sprintf("%s:%s", config.DB.Host, config.DB.Port),
+		Addr:      fmt.Sprintf("%s:%s", config.DB.Driver, config.DB.Port),
 		Net:       "tcp",
 		ParseTime: true,
 		Collation: "utf8mb4_unicode_ci",

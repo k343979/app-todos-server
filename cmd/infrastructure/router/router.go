@@ -4,6 +4,7 @@ package router
 import (
 	"context"
 
+	"github.com/app-todos/cmd/adapter/controller"
 	"github.com/app-todos/library/logger"
 
 	"github.com/gin-contrib/cors"
@@ -15,9 +16,13 @@ const (
 )
 
 var (
-	Origin []string = []string{"http://localhost:8080"}            // ベースURL
-	Method []string = []string{"GET", "POST", "DELETE", "OPTIONS"} // HTTP通信メソッド
-	Header []string = []string{"*"}                                // ヘッダー
+	Origin []string = []string{"http://localhost:8080"}                   // ベースURL
+	Method []string = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"} // HTTP通信メソッド
+	Header []string = []string{"*"}                                       // ヘッダー
+)
+
+var (
+	userC controller.IUser
 )
 
 // ルーティング情報構造体
@@ -44,12 +49,32 @@ func NewRoute() *Route {
 
 // SetRoute
 // Route構造体をもとにルーティングを設定
-func (r *Route) SetRoute() {
+// param ctx : コンテキスト
+func (r *Route) SetRoute(ctx context.Context) {
 	r.Gin.Use(cors.New(cors.Config{
 		AllowOrigins: r.Origin,
 		AllowMethods: r.Method,
 		AllowHeaders: r.Header,
 	}))
+
+	// コントローラのセット
+	setControllers(ctx)
+
+	v1 := r.Gin.Group("/v1")
+	{
+		user := v1.Group("/user")
+		{
+			user.GET("/:id", userC.ByID)
+			user.PUT("", userC.Update)
+		}
+	}
+}
+
+// SetControllers
+// コントローラのセット
+// param ctx : コンテキスト
+func setControllers(ctx context.Context) {
+	userC = controller.NewUser(ctx)
 }
 
 // Run
@@ -61,7 +86,7 @@ func Run(ctx context.Context) {
 
 	// ルーティング設定
 	r := NewRoute()
-	r.SetRoute()
+	r.SetRoute(ctx)
 	// ルーティング定義
 	r.Gin.Run(r.Port)
 }
