@@ -6,7 +6,6 @@ import (
 
 	"github.com/app-todos/cmd/adapter/controller"
 	"github.com/app-todos/library/logger"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +22,7 @@ var (
 
 var (
 	userC controller.IUser
+	taskC controller.ITask
 )
 
 // ルーティング情報構造体
@@ -67,6 +67,13 @@ func (r *Route) SetRoute(ctx context.Context) {
 			user.GET("/:id", userC.ByID)
 			user.PUT("", userC.Update)
 		}
+
+		task := v1.Group("/task")
+		{
+			task.GET("", taskC.Fetch)
+			task.GET("/:id", taskC.ByID)
+			task.PUT("", taskC.Update)
+		}
 	}
 }
 
@@ -75,6 +82,7 @@ func (r *Route) SetRoute(ctx context.Context) {
 // param ctx : コンテキスト
 func setControllers(ctx context.Context) {
 	userC = controller.NewUser(ctx)
+	taskC = controller.NewTask(ctx)
 }
 
 // Run

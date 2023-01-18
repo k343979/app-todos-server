@@ -9,7 +9,6 @@ import (
 	"github.com/app-todos/cmd/infrastructure/database/mysql"
 	"github.com/app-todos/cmd/usecase"
 	"github.com/app-todos/library/logger"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,7 +37,7 @@ type IUser interface {
 func NewUser(ctx context.Context) IUser {
 	db, err := database.Connect()
 	if err != nil {
-		logger.Log.Error(err)
+		logger.Log.Errorf("DB Connect err: %w", err)
 	}
 	IUserRepo := mysql.NewUser(ctx, db)
 	return &User{
