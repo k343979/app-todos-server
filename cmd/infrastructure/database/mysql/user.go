@@ -6,7 +6,6 @@ import (
 
 	"github.com/app-todos/cmd/domain/entity"
 	"github.com/app-todos/cmd/domain/repository"
-
 	"github.com/uptrace/bun"
 )
 
